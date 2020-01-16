@@ -1,26 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState, Fragment} from 'react';
 import './App.css';
+import UserList from "./components/user-list";
+import ButtonAppBar from "./components/app-bar";
+import Container from '@material-ui/core/Container';
+import AddUser from "./components/add-user";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const initUsers = [];
+    const [users, updateUsers] = useState(initUsers);
+    const onUserUpdateClicked = (newUser) => {
+        updateUsers([...users, newUser]);
+    };
+
+    // componentDidMount
+    useEffect(() => {
+        setTimeout(() => {
+            fetch('https://jsonplaceholder.typicode.com/users')
+                .then(response => response.json())
+                .then(updateUsers);
+        }, 3000);
+    }, []);
+
+    return (
+        <div className="App">
+            <ButtonAppBar/>
+            {
+                !!users.length ?
+                <Fragment>
+                    <Container maxWidth="md">
+                        <UserList users={users}/>
+                    </Container>
+                    <Container>
+                        <AddUser onUserUpdateClicked={onUserUpdateClicked}/>
+                    </Container>
+                </Fragment> :
+                    <p>loading...</p>
+            }
+        </div>
+    );
 }
 
 export default App;
